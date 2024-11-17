@@ -1,0 +1,60 @@
+==========
+
+After the variable selection, it's natural for us to consider two questions:
+    1. How can we validate our results?
+    2. Can we find a better prediction model using the selected variables?
+The solutions *we* choose are PCA and PCR.
+
+PCA is a technique that
+    1. reduces dimensionality, while
+    2. preserving as much information as possible.
+
+It achieves this by transforming the sample data into a new set of axes.
+The original bases are the variables (in our case, GENE).
+The new set of bases are called Principle Components, they are:
+    1. linear combinations of all variables.
+    2. uncorrelated, and
+    3. maximise the variance.
+
+Here is the formula for PC decomposition. Notice that: 
+    1. X is centred, and we strongly advise to scale it.
+    2. There are 2-3 ways to compute the loading matrix:
+        (a) SVD on X
+        (b) Eigen Decomposition on X, if X square
+        (c) Eigen Decomposition on X^T X = nS, if X rectangular
+
+==========
+
+The reason we chose PCA for validation is that the score plot provides good visualisations. From the PC1-PC2 score plot, we can see that, before variable selection, there was no cluster, while after selection, the clusters were completely separated.
+
+But before rushing to a conclusion, there are 4 important limitations to notice:
+
+    1. PCA results depend heavily on PC selection, but there is no unique answer. Luckily, we can look for some guidelines in the elbow point in the scree plot for PCA, which suggests 2 PC, and the minimum point in the validation plot for PCR.
+
+    2. The fact that the PC directions that explain the largest variance (in GENE data) are not necessarily the best indicators for the response (DISEASE STATE). This is an important assumption to perform PCE, to check for this assumption, we tried score plots on different pairs of PCs, and luckily, none of them give a clear separation of clusters.
+
+    3. PCA does not perform variable selection, because each PC is a linear combination of ALL variables. Therefore it lacks of interpretability - most of its results only suggest possible patterns, but do not provide solid evidence. For the score plot, although there are no quantitative indicators, research shows that only total separation gives high statistical significance, other partial separations are not consistent with significance.
+
+    4. The process is unsupervised, so clustering of sample points alone does not validate our results, we also need the response (colours) to be separated along the clusters as well.
+
+Finally, we can reach our conclusion that the selected variables can distinguish the samples, by disease states, with high statistical significance.
+
+==========
+
+Then we would like to try PCR on the selected variables only, to see if we can achieve a better prediction accuracy.
+PCR performs a least square regression on selected PCs derived from PCA. As we mentioned before, we can use a minimum validation value to determine the number of PCs to select. The validation value we choose is RMSEP, the formula is kind of obvious from its name, Root Mean Square Error of Prediction.
+
+==========
+
+We constructed a prediction-observation graph for our PCR model and the result is pretty satisfying, see, if we draw a line on 0.5, there is nearly no mistake.
+So how exactly is its accuracy compared to our previous models? We made another box plot.
+
+==========
+
+If it's hard to see clearly, this line right there is the PCR model on the selected variables, and yes, its accuracy is 100% in our experiments.
+
+==========
+
+So, our final conclusion is that, compared to simple LASSO or Ridge Regressions, performing PCR Regression on variables selected by LASSO gives a more accurate model. The discovery of combining different regression methods inspired us to explore ensemble learning in the future, and we hope that, by consistently enhancing our understanding and refining the models, we can help identify more reliable biomarkers one day.
+
+
